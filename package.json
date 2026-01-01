@@ -1,0 +1,30 @@
+{
+  "name": "podcast-transcriber",
+  "version": "1.0.0",
+  "description": "A podcast transcription desktop app with speaker diarization",
+  "main": "main.js",
+  "scripts": {
+    "dev": "electron .",
+    "build": "electron-builder",
+    "start": "electron ."
+  },
+  "keywords": [
+    "podcast",
+    "transcription",
+    "electron"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^31.0.0"
+  },
+  "dependencies": {
+    "@electron/remote": "^2.1.3",
+    "axios": "^1.7.2",
+    "baidu-aip-sdk": "^4.16.16",
+    "dotenv": "^17.2.3",
+    "fluent-ffmpeg": "^2.1.3",
+    "form-data": "^4.0.5",
+    "uuid": "^10.0.0"
+  }
+}

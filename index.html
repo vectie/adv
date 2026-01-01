@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Podcast转录工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .input-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        
+        input[type="text"] {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #f0f4f8;
+            color: #334155;
+        }
+        
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+        
+        .progress-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .result-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .transcription-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+        
+        .speaker { 
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .speaker.host {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+        
+        .speaker.guest {
+            background: #fef3c7;
+            color: #b45309;
+        }
+        
+        .transcription-text {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #334155;
+        }
+        
+        .status {
+            font-size: 14px;
+            color: #64748b;
+            margin-top: 10px;
+        }
+        
+        .file-info {
+            font-size: 14px;
+            color: #64748b;
+            margin-top: 10px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Podcast转录工具</h1>
+            <p class="subtitle">支持本地文件和在线链接，自动区分主持人与嘉宾</p>
+        </header>
+        
+        <div class="input-section">
+            <h2 style="margin-bottom: 20px; color: #334155;">输入选项</h2>
+            
+            <div class="input-row">
+                <button class="btn-secondary" id="selectFileBtn">选择本地文件</button>
+                <span class="file-info" id="fileInfo">未选择文件</span>
+            </div>
+            
+            <div class="input-row">
+                <input type="text" id="urlInput" placeholder="或输入Podcast在线链接">
+                <button class="btn-primary" id="startBtn">开始转录</button>
+            </div>
+        </div>
+        
+        <div class="progress-section" id="progressSection">
+            <div>正在处理中...</div>
+            <div class="status" id="statusText"></div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+        
+        <div class="result-section" id="resultSection" style="display: none;">
+            <h2 style="margin-bottom: 20px; color: #334155;">转录结果</h2>
+            <div id="transcriptionResult"></div>
+        </div>
+    </div>
+    
+    <script>
+        const selectFileBtn = document.getElementById('selectFileBtn');
+        const fileInfo = document.getElementById('fileInfo');
+        const urlInput = document.getElementById('urlInput');
+        const startBtn = document.getElementById('startBtn');
+        const progressSection = document.getElementById('progressSection');
+        const statusText = document.getElementById('statusText');
+        const progressFill = document.getElementById('progressFill');
+        const resultSection = document.getElementById('resultSection');
+        const transcriptionResult = document.getElementById('transcriptionResult');
+        
+        let selectedFile = null;
+        
+        selectFileBtn.addEventListener('click', async () => {
+            console.log('选择文件按钮被点击');
+            try {
+                const { dialog } = require('@electron/remote');
+                console.log('dialog对象:', dialog);
+                
+                const result = await dialog.showOpenDialog({
+                    filters: [
+                        { name: 'Audio/Video Files', extensions: ['mp3', 'mp4', 'm4a', 'wav', 'aac'] },
+                        { name: 'All Files', extensions: ['*'] }
+                    ],
+                    properties: ['openFile']
+                });
+                
+                console.log('选择文件结果:', result);
+                selectedFile = result.filePaths[0] || null;
+                
+                if (selectedFile) {
+                    fileInfo.textContent = selectedFile.split('\\').pop();
+                    urlInput.value = '';
+                }
+            } catch (error) {
+                console.error('选择文件出错:', error);
+                alert('选择文件时出错: ' + error.message);
+            }
+        });
+        
+        startBtn.addEventListener('click', async () => {
+            const url = urlInput.value.trim();
+            
+            if (!selectedFile && !url) {
+                alert('请选择本地文件或输入在线链接');
+                return;
+            }
+            
+            progressSection.style.display = 'block';
+            resultSection.style.display = 'none';
+            transcriptionResult.innerHTML = '';
+            
+            try {
+                let audioPath;
+                
+                if (selectedFile) {
+                    statusText.textContent = '正在准备转录...';
+                    progressFill.style.width = '50%';
+                    audioPath = selectedFile;
+                } else {
+                    statusText.textContent = '正在下载Podcast...';
+                    progressFill.style.width = '30%';
+                    audioPath = await window.electronAPI.downloadPodcast(url);
+                }
+                
+                statusText.textContent = '正在转录并区分发言人...';
+                progressFill.style.width = '70%';
+                
+                const result = await window.electronAPI.transcribe(audioPath);
+                
+                if (result.status === 'success') {
+                    displayTranscription(result.transcription);
+                    statusText.textContent = '转录完成';
+                    progressFill.style.width = '100%';
+                    
+                    setTimeout(() => {
+                        progressSection.style.display = 'none';
+                        resultSection.style.display = 'block';
+                    }, 1000);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('处理失败: ' + error.message);
+                progressSection.style.display = 'none';
+            }
+        });
+        
+        function displayTranscription(transcription) {
+            transcription.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'transcription-item';
+                
+                const speakerClass = item.speaker === '主持人' ? 'host' : 'guest';
+                
+                itemDiv.innerHTML = `
+                    <div class="speaker ${speakerClass}">${item.speaker}</div>
+                    <div class="transcription-text">${item.text}</div>
+                `;
+                
+                transcriptionResult.appendChild(itemDiv);
+            });
+        }
+    </script>
+</body>
+</html>
