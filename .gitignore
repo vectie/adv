@@ -42,3 +42,51 @@ coverage/
 *.pem
 *.cer
 *.csr
+
+# Python
+# Virtual environments
+venv/
+.env/
+.venv/
+env/
+
+# Compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+.cache/
+
+# Logs
+*.log
+
+# IDE files
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build outputs
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Misc
+.tox/
+.eggs/
+MANIFEST
+
+# Local env files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local

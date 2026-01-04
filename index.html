@@ -129,8 +129,152 @@
             border-radius: 12px;
             padding: 30px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            max-height: 500px;
+            max-height: 600px;
             overflow-y: auto;
+        }
+        
+        .modules-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .module-card {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .module-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+        
+        .module-card.selected {
+            border-color: #667eea;
+            background: #e0e7ff;
+        }
+        
+        .module-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #334155;
+        }
+        
+        .module-description {
+            font-size: 14px;
+            color: #64748b;
+            line-height: 1.4;
+        }
+        
+        .module-results {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+        
+        .results-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+        
+        .tab {
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #64748b;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .chart-container {
+            width: 100%;
+            height: 400px;
+            margin: 20px 0;
+        }
+        
+        .analysis-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .analysis-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #334155;
+        }
+        
+        .analysis-content {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #475569;
+        }
+        
+        .suggestion-list {
+            list-style-type: decimal;
+            margin-left: 20px;
+        }
+        
+        .suggestion-list li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-1px);
         }
         
         .transcription-item {
@@ -208,114 +352,35 @@
             </div>
         </div>
         
+        <div class="modules-section" id="modulesSection" style="display: none;">
+            <h2 style="margin-bottom: 20px; color: #334155;">选择分析模块</h2>
+            <p style="color: #64748b; margin-bottom: 20px;">选择您想要使用的分析模块，系统将基于转录结果为您提供深入分析</p>
+            
+            <div class="modules-grid" id="modulesGrid">
+                <!-- 模块卡片将通过JavaScript动态生成 -->
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn-success" id="analyzeBtn">开始分析</button>
+                <button class="btn-secondary" id="clearSelectionBtn">清除选择</button>
+            </div>
+        </div>
+        
         <div class="result-section" id="resultSection" style="display: none;">
-            <h2 style="margin-bottom: 20px; color: #334155;">转录结果</h2>
+            <h2 style="margin-bottom: 20px; color: #334155;">分析结果</h2>
+            
+            <div class="results-tabs" id="resultsTabs">
+                <!-- 结果标签将通过JavaScript动态生成 -->
+            </div>
+            
             <div id="transcriptionResult"></div>
+            
+            <div class="module-results" id="moduleResults" style="display: none;">
+                <!-- 模块分析结果将通过JavaScript动态生成 -->
+            </div>
         </div>
     </div>
     
-    <script>
-        const selectFileBtn = document.getElementById('selectFileBtn');
-        const fileInfo = document.getElementById('fileInfo');
-        const urlInput = document.getElementById('urlInput');
-        const startBtn = document.getElementById('startBtn');
-        const progressSection = document.getElementById('progressSection');
-        const statusText = document.getElementById('statusText');
-        const progressFill = document.getElementById('progressFill');
-        const resultSection = document.getElementById('resultSection');
-        const transcriptionResult = document.getElementById('transcriptionResult');
-        
-        let selectedFile = null;
-        
-        selectFileBtn.addEventListener('click', async () => {
-            console.log('选择文件按钮被点击');
-            try {
-                const { dialog } = require('@electron/remote');
-                console.log('dialog对象:', dialog);
-                
-                const result = await dialog.showOpenDialog({
-                    filters: [
-                        { name: 'Audio/Video Files', extensions: ['mp3', 'mp4', 'm4a', 'wav', 'aac'] },
-                        { name: 'All Files', extensions: ['*'] }
-                    ],
-                    properties: ['openFile']
-                });
-                
-                console.log('选择文件结果:', result);
-                selectedFile = result.filePaths[0] || null;
-                
-                if (selectedFile) {
-                    fileInfo.textContent = selectedFile.split('\\').pop();
-                    urlInput.value = '';
-                }
-            } catch (error) {
-                console.error('选择文件出错:', error);
-                alert('选择文件时出错: ' + error.message);
-            }
-        });
-        
-        startBtn.addEventListener('click', async () => {
-            const url = urlInput.value.trim();
-            
-            if (!selectedFile && !url) {
-                alert('请选择本地文件或输入在线链接');
-                return;
-            }
-            
-            progressSection.style.display = 'block';
-            resultSection.style.display = 'none';
-            transcriptionResult.innerHTML = '';
-            
-            try {
-                let audioPath;
-                
-                if (selectedFile) {
-                    statusText.textContent = '正在准备转录...';
-                    progressFill.style.width = '50%';
-                    audioPath = selectedFile;
-                } else {
-                    statusText.textContent = '正在下载Podcast...';
-                    progressFill.style.width = '30%';
-                    audioPath = await window.electronAPI.downloadPodcast(url);
-                }
-                
-                statusText.textContent = '正在转录并区分发言人...';
-                progressFill.style.width = '70%';
-                
-                const result = await window.electronAPI.transcribe(audioPath);
-                
-                if (result.status === 'success') {
-                    displayTranscription(result.transcription);
-                    statusText.textContent = '转录完成';
-                    progressFill.style.width = '100%';
-                    
-                    setTimeout(() => {
-                        progressSection.style.display = 'none';
-                        resultSection.style.display = 'block';
-                    }, 1000);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('处理失败: ' + error.message);
-                progressSection.style.display = 'none';
-            }
-        });
-        
-        function displayTranscription(transcription) {
-            transcription.forEach(item => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'transcription-item';
-                
-                const speakerClass = item.speaker === '主持人' ? 'host' : 'guest';
-                
-                itemDiv.innerHTML = `
-                    <div class="speaker ${speakerClass}">${item.speaker}</div>
-                    <div class="transcription-text">${item.text}</div>
-                `;
-                
-                transcriptionResult.appendChild(itemDiv);
-            });
-        }
-    </script>
+    <script src="./src/renderer/main.js"></script>
 </body>
 </html>

@@ -32,7 +32,7 @@ def start_server():
     # 启动服务器
     server_process = subprocess.Popen([
         sys.executable, "-m", "uvicorn", 
-        "main:app", 
+        "app.main:app", 
         "--host", "0.0.0.0",
         "--port", "8000",
         "--workers", "1"

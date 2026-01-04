@@ -2,7 +2,7 @@
   "name": "podcast-transcriber",
   "version": "1.0.0",
   "description": "A podcast transcription desktop app with speaker diarization",
-  "main": "main.js",
+  "main": "src/main/app.js",
   "scripts": {
     "dev": "electron .",
     "build": "electron-builder",
