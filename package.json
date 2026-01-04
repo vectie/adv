@@ -1,22 +1,31 @@
 {
   "name": "podcast-transcriber",
   "version": "1.0.0",
-  "description": "A podcast transcription desktop app with speaker diarization",
+  "type": "module",
   "main": "src/main/app.js",
   "scripts": {
-    "dev": "electron .",
-    "build": "electron-builder",
-    "start": "electron ."
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "electron": "electron ."
   },
   "keywords": [
     "podcast",
     "transcription",
-    "electron"
+    "electron",
+    "react"
   ],
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^31.0.0"
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.16",
+    "electron": "^31.0.0",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.4.0",
+    "vite": "^5.0.8"
   },
   "dependencies": {
     "@electron/remote": "^2.1.3",
@@ -24,6 +33,8 @@
     "baidu-aip-sdk": "^4.16.16",
     "dotenv": "^17.2.3",
     "fluent-ffmpeg": "^2.1.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "uuid": "^10.0.0"
   }
 }
